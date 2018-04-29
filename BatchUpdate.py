@@ -10,14 +10,14 @@ import xml.etree.ElementTree as ET	#handling xml data from Alma
 	prompt and determines which functionality to execute based on flags.  This
 	allows for progressive checks to verify data isn't being mishandled. So far
 	there will be programmed:
-		1) --f(ormat): takes a csv file of items pulled out of Alma, and removes
+		1) -f(ormat): takes a csv file of items pulled out of Alma, and removes
 		all extraneous information.  The input csv should be preformatted to not
 		include any commas besides the delimiters. This only outputs a single
 		file using the format 'formatted-inputfile'
-		2) --s(plit): takes a csv file, updates columns according to defaults
+		2) -s(plit): takes a csv file, updates columns according to defaults
 		given, and runs a set of regular expressions on the description field to
 		extract its information.
-		3) --u(pdate): takes a csv file and will push the each item's
+		3) -u(pdate): takes a csv file and will push the each item's
 		information back into Alma according to the the 
 		   
 		 ******************************* WARNING *******************************
@@ -27,18 +27,17 @@ import xml.etree.ElementTree as ET	#handling xml data from Alma
 		 * to do the following steps:                                          *
 		 *                                                                     *
 		 *   1) Open the original file as an Excel spreadsheet (not csv).      *
-		 *		Search and replace all commas with '' (empty string). Ensure   *
+		 *	Search and replace all commas with '' (empty string). Ensure   *
 		 *      none of the data is kept in a named table. That messes stuff   *
-		 *      up for some reason.                          				   *
+		 *      up for some reason.                     		       *
 		 *   2) Save the file in the csv format, and open it this time in a    *
-		 *	    text editor that can handle regular expressions (e.g.		   *
-		 *	    Notepad++). Do a regex replace of '\n\s\s+' with               *
-		 *		'\s'. This will replace the typical indented newline that is   *
-		 *      not associated with   										   *
-		 *		CSV formatting. Save over the csv file.        				   *
+		 *	text editor that can handle regular expressions (e.g. 	       *
+		 *	Notepad++). Do a regex replace of '\n\s\s+' with '\s'. This    *
+		 *	will replace the typical indented newline that is not 	       *
+		 *	associated with CSV formatting. Save over the csv file.        *
 		 *   3) You should now be able to use the program without breaking it. *
-		 *		If you still somehow managed to break it, congratulations!     *
-		 *		Contact Brendan Deroo (bderoo@bu.edu) for help fixing it.      *
+		 *	If you still somehow managed to break it, congratulations!     *
+		 *	Contact Brendan Deroo (bderoo@bu.edu) for help fixing it.      *
 		 ***********************************************************************
 """
 
@@ -114,26 +113,26 @@ def main():
 		a prefixed one is present in the location."""
 	
 	if len(sys.argv) < 3:
-		print("usage: ./Test.py inputCSVorTXT {--f|--s|--u}")
+		print("usage: BatchUpdate.py inputCSVorTXT {-f|-s|-u}")
 		sys.exit(1)
 	
 	filename = sys.argv[1]
 	flags = sys.argv[2:]
 	
-	if '--f' in flags:
+	if '-f' in flags:
 		filename = format(filename)
-	if '--s' in flags:
+	if '-s' in flags:
 		filename = split(filename)
-	if '--u' in flags:
-		if ('--f' in flags) or ('--s' in flags):
+	if '-u' in flags:
+		if ('-f' in flags) or ('-s' in flags):
 			text = str(input("Are you sure you want to update without reviewing the data? (Y/N) "))
 			print(text.upper())
 			if text.upper() != 'Y':
 				print("Halting processes")
 				sys.exit(1)
 		filename = update(filename)
-	if ('--f' not in flags) and ('--s' not in flags) and ('--u' not in flags):
-		print("usage: ./Test.py inputCSVorTXT {--f|--s|--u}")
+	if ('-f' not in flags) and ('-s' not in flags) and ('-u' not in flags):
+		print("usage: BatchUpdate.py inputCSV {-f|-s|-u}")
 		sys.exit(1)
 		
 """ format()
