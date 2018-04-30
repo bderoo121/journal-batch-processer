@@ -5,41 +5,11 @@ import sys 		#interpreter functions and variables
 import time		#for timing processes
 import xml.etree.ElementTree as ET	#handling xml data from Alma
 
-""" main()
-	The function main() pulls out the arguments passed through the command
-	prompt and determines which functionality to execute based on flags.  This
-	allows for progressive checks to verify data isn't being mishandled. So far
-	there will be programmed:
-		1) -f(ormat): takes a csv file of items pulled out of Alma, and removes
-		all extraneous information.  The input csv should be preformatted to not
-		include any commas besides the delimiters. This only outputs a single
-		file using the format 'formatted-inputfile'
-		2) -s(plit): takes a csv file, updates columns according to defaults
-		given, and runs a set of regular expressions on the description field to
-		extract its information.
-		3) -u(pdate): takes a csv file and will push the each item's
-		information back into Alma according to the the 
-		   
-		 ******************************* WARNING *******************************
-		 *   This program heavily relies on the CSV format, which depends on   *
-		 *    both commas and newline characters when interpreting the file.   *
-		 *  Stray commas or newlines can break the program. It is recommended  *
-		 * to do the following steps:                                          *
-		 *                                                                     *
-		 *   1) Open the original file as an Excel spreadsheet (not csv).      *
-		 *	Search and replace all commas with '' (empty string). Ensure   *
-		 *      none of the data is kept in a named table. That messes stuff   *
-		 *      up for some reason.                     		       *
-		 *   2) Save the file in the csv format, and open it this time in a    *
-		 *	text editor that can handle regular expressions (e.g. 	       *
-		 *	Notepad++). Do a regex replace of '\n\s\s+' with '\s'. This    *
-		 *	will replace the typical indented newline that is not 	       *
-		 *	associated with CSV formatting. Save over the csv file.        *
-		 *   3) You should now be able to use the program without breaking it. *
-		 *	If you still somehow managed to break it, congratulations!     *
-		 *	Contact Brendan Deroo (bderoo@bu.edu) for help fixing it.      *
-		 ***********************************************************************
-"""
+# The api keys have been removed to prevent accidental editing of working
+# records. Api keys can be requested from the Ex Libris developer site:
+# https://developers.exlibrisgroup.com/alma/apis
+sandbox_apikey = '####################################'
+active_apikey = '####################################'
 
 # Tuples designate the column name, flags indicating how to process the
 # item, and optionally what the default value of items should be when
@@ -67,8 +37,6 @@ add = [('Material Type','t','Bound Issue'),('Item Policy','t','non-circulating')
 # The code tables are by no means complete.  I've filled out the most
 # frequently used options, but checks should inform user to update the table
 # if their value isn't accepted.
-""" TODO: Consider pulling data tables from Alma whenever the check is
-	initialized, just in case values ever change."""
 code_tables = {'Status':{
 					'Item not in place': '0',
 					 'Item in place': '1'},
@@ -108,10 +76,42 @@ code_tables = {'Status':{
 					'Requested': 'REQUESTED',
 					'In Transit to Remote Storage': 'TRANSIT_TO_REMOTE_STORAGE'}}
 
-def main():
-	"""TODO: Add check for when script is working off a prefixless filename but
-		a prefixed one is present in the location."""
-	
+""" main()
+	The function main() pulls out the arguments passed through the command
+	prompt and determines which functionality to execute based on flags.  This
+	allows for progressive checks to verify data isn't being mishandled. So far
+	there will be programmed:
+		1) -f(ormat): takes a csv file of items pulled out of Alma, and removes
+		all extraneous information.  The input csv should be preformatted to not
+		include any commas besides the delimiters. This only outputs a single
+		file using the format 'formatted-inputfile'
+		2) -s(plit): takes a csv file, updates columns according to defaults
+		given, and runs a set of regular expressions on the description field to
+		extract its information.
+		3) -u(pdate): takes a csv file and will push the each item's
+		information back into Alma according to the the 
+		   
+		 ******************************* WARNING *******************************
+		 *   This program heavily relies on the CSV format, which depends on   *
+		 *    both commas and newline characters when interpreting the file.   *
+		 *  Stray commas or newlines can break the program. It is recommended  *
+		 * to do the following steps:                                          *
+		 *                                                                     *
+		 *   1) Open the original file as an Excel spreadsheet (not csv).      *
+		 *	Search and replace all commas with '' (empty string). Ensure   *
+		 *      none of the data is kept in a named table. That messes stuff   *
+		 *      up for some reason.                     		       *
+		 *   2) Save the file in the csv format, and open it this time in a    *
+		 *	text editor that can handle regular expressions (e.g. 	       *
+		 *	Notepad++). Do a regex replace of '\n\s\s+' with '\s'. This    *
+		 *	will replace the typical indented newline that is not 	       *
+		 *	associated with CSV formatting. Save over the csv file.        *
+		 *   3) You should now be able to use the program without breaking it. *
+		 *	If you still somehow managed to break it, congratulations!     *
+		 *	Contact Brendan Deroo (bderoo@bu.edu) for help fixing it.      *
+		 ***********************************************************************
+"""
+def main():	
 	if len(sys.argv) < 3:
 		print("usage: BatchUpdate.py inputCSVorTXT {-f|-s|-u}")
 		sys.exit(1)
@@ -184,9 +184,7 @@ def format(filename):
 		certain necessary columns are present.
 		- Does not attempt to filter out items with anomalous information (i.e.
 		"i" barcodes or missing data; this is handled by update()
-		
-		TODO: Ensure duplicate columns are handled
-		
+
 """	
 def split(filename):
 
@@ -198,7 +196,6 @@ def split(filename):
 	
 	# Add columns to the data that need to be present, retrieve indexes
 	# for referencing, and record columns with formatting.
-	"""TOOD: Check whether num or derived is needed"""
 	(data, ind, num, derived) = _checkColumns(data, mand, opt, add)
 	
 	# Always add the "Pattern" and "Notes" columns if they aren't present.
@@ -231,8 +228,6 @@ def split(filename):
 			
 			# Check whether the column is one that can only support the limited
 			# number of options given in code_tables
-			"""TODO: Implement network checks for whether there is a code table 
-				for every column."""
 			if opt_colname in code_tables:
 				#-> Check replacement against possible values until a valid
 				#   option is found. Update all blank values with the
@@ -260,8 +255,6 @@ def split(filename):
 					
 			# Check whether the column is one that can only support the limited
 			# number of options given in code_tables
-			"""TODO: Implement network checks for whether there is a code table 
-				for every column."""
 			if add_colname in code_tables:
 				#-> Check replacement against possible values until a valid
 				#   option is found. Update all values with the replacement.
@@ -307,9 +300,6 @@ def split(filename):
 	#Run various other tests and processes on each item to clean them up.
 	#Currently programmed are Barcode checks, material type check, Chron I
 	#smartguessing, and Chron J reformatting (so far).
-	"""	
-		TODO: Make notes on words found in description, like 'inc.' or 'index'
-	"""
 	
 	# Run tests on the barcodes:
 	for row in data[1:]:
@@ -322,9 +312,7 @@ def split(filename):
 			row[ind["Notes"]] += ("; ","")[row[ind["Notes"]] == ''] + "Err: i-barcode"
 			
 	# Description specific tests:
-	"""TODO: Look into ways to merge this description test block with the
-		previous one"""
-	if "Description" in ind:
+	if 'Description' in ind:
 	
 		# Set up some structures and patterns to be used for the upcoming tests.
 		start_year_pat = re.compile('^(\d+)(.*)')
@@ -341,13 +329,6 @@ def split(filename):
 			# TEST: Chron_I "smart guess". Looks for year data encapsulated in
 			# two digit numbers (e.g. Ap-Je98) and reinterprets it as a 4 digit
 			# year depending on its neighbors. Requires the data to be sorted.
-			"""
-				TODO: Redo test interpreting the years entirely as years, or 
-				  as numbers
-				TODO: Handle residual question marks somehow
-				TODO: Redo this entire mess.  I can't even understand what
-				  is going on anymore
-			"""
 			year_match = start_year_pat.search(data[i][ind["Chron I"]])
 			if year_match != None: # -> Year was provided
 				year = year_match.group(1)
@@ -388,7 +369,6 @@ def split(filename):
 							j += 1
 
 					if (prev_year != "?") and (next_year != "?"):
-						"""TODO: This whole section again. blech"""
 						# Try appending a number of digits from the previous and
 						# next years until(prev year<=current year<=next year) makes
 						# sense.  If it continues to not make sense, check that both
@@ -444,15 +424,7 @@ def split(filename):
 	
 def update(filename):
 	
-	# The api keys have been removed to prevent accidental editing of working
-	# records. Api keys can be requested from the Ex Libris developer site:
-	# https://developers.exlibrisgroup.com/alma/apis
-	
-	sandbox_apikey = '####################################'
-	active_apikey = '####################################'
-	
 	apikey = active_apikey
-
 
 	# This is the shortcut API call that fetches item information using only a
 	# barcode. Super helpful.
